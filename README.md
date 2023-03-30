@@ -1,6 +1,6 @@
 # decode-that-mastermind
 
-A (static) site to manage codes and get possible solutions for (NL) Radio 538's 'Code = Cashen' game.
+A (static) site to manage codes and get possible solutions for (NL) Radio 538's 'Code = Cashen' game. The goal of the game is to get a 5 number code, where each code is denominated numbers ranging from 0 to 9.
 
 ## Project setup
 ```
