@@ -24,7 +24,9 @@ npm run build
 
 ### Functionality:
 
-* Entry field for each called-in code consisting out of 5 numbers
-* Entry field for each correct number of the code (correct positioning is unknown)
+* Adding called-in codes to a called-in codes list
+  * Entry field for each called-in code consisting out of 5 numbers
+  * Entry field for how many numbers in that code are correct (correct positioning is unknown)
+* Remove item from called-in codes list
 * Device storage
 * List of possibly entries with all code positions (per code to the power of 5)
