@@ -38,19 +38,26 @@
     </v-app-bar>
 
     <v-main>
-      <router-view/>
+      <Possibilities/>
+      <!-- <HelloWorld/> -->
     </v-main>
   </v-app>
 </template>
 
-<script lang="ts">
-import Vue from 'vue';
+<script>
+import HelloWorld from './components/HelloWorld';
+import Possibilities from './components/Possibilites.vue';
 
-export default Vue.extend({
+export default {
   name: 'App',
+
+  components: {
+    HelloWorld,
+    Possibilities
+  },
 
   data: () => ({
     //
   }),
-});
+};
 </script>
