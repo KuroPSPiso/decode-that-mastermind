@@ -13,17 +13,24 @@
     </v-list>
 
     <!--code possibilities-->
-    <v-list>
+    <!-- <v-list>
       <v-list-item v-for="code in possibilities" :key="code">
           <v-list-item-content>
-              <v-list-item-title>{{code}}</v-list-item-title>
+              <v-list-item-title>{{code.x1}}{{code.x2}}{{code.x3}}{{code.x4}}{{code.x5}}</v-list-item-title>
           </v-list-item-content>
       </v-list-item>
-    </v-list>
+    </v-list> -->
+
+    <div>
+      {{json_map}}
+    </div>
   </div>
 </template>
 
 <script>
+import defaultPossibilities from '../assets/default_possibilities.json'
+
+
 export default {
     name: 'Possibilities',
     data() {
@@ -31,16 +38,22 @@ export default {
             temp_codeArr: [],
             temp_codeMap: new Map(),
             temp_codeRange: 9,
-            possibilities: []
+            possibilities: [],
+            json_map: ''
         }
     },
     methods: {
       async generatePossibilitiesBlank() {
-        //generate initialPossibilities
-        for(var i = 0; i <= 9; i++){
+        //load initial Possibilities (static 00000 -> 99999)
+        this.possibilities = defaultPossibilities
+
+        /*
+        for(var i = 0; i <= 99999; i++){
           const sCode = i.toString().padStart(5, '0')
-          this.possibilities.push(sCode)
+          const cCharCode = { x1: sCode[0],  x2: sCode[1],  x3: sCode[2],  x4: sCode[3],  x5: sCode[4] } 
+          this.possibilities.push(cCharCode)
         }
+        this.json_map = JSON.stringify(this.possibilities)*/
       }
     },
     computed: {
@@ -72,7 +85,7 @@ export default {
           this.temp_codeArr.push({ numbers: key, numCorrect: value})
         })
 
-        this.generatePossibilitiesBlank()
+        await this.generatePossibilitiesBlank()
     }
 }
 </script>
