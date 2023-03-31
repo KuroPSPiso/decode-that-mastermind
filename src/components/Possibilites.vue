@@ -13,6 +13,12 @@
     </v-list>
 
     <!--code possibilities-->
+    <div v-if="!isPocessing">
+      {{possibilitiesView}}
+    </div>
+    <div v-else>
+      processing possibilities...
+    </div>
     <!-- <v-list>
       <v-list-item v-for="code in possibilities" :key="code">
           <v-list-item-content>
@@ -39,6 +45,8 @@ export default {
             temp_codeMap: new Map(),
             temp_codeRange: 9,
             possibilities: [],
+            possibilitiesView: [],
+            isPocessing: false,
             json_map: ''
         }
     },
@@ -47,7 +55,14 @@ export default {
         //load initial Possibilities (static 00000 -> 99999)
         this.possibilities = defaultPossibilities
 
+        this.possibilities.forEach(possibility => {
+          this.possibilitiesView.push(`${possibility.x1}${possibility.x2}${possibility.x3}${possibility.x4}${possibility.x5}`)
+        })
+
+        this.isPocessing = false;
+
         /*
+        //generate json
         for(var i = 0; i <= 99999; i++){
           const sCode = i.toString().padStart(5, '0')
           const cCharCode = { x1: sCode[0],  x2: sCode[1],  x3: sCode[2],  x4: sCode[3],  x5: sCode[4] } 
@@ -85,6 +100,7 @@ export default {
           this.temp_codeArr.push({ numbers: key, numCorrect: value})
         })
 
+        this.isPocessing = true;
         await this.generatePossibilitiesBlank()
     }
 }
