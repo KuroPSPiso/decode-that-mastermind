@@ -4,7 +4,7 @@
     <v-list>
       <v-list-item v-for="code in temp_codeArr" :key="code.numbers">
           <v-list-item-action>
-              <v-icon icon="mdi-delete-outline"></v-icon>
+              <v-icon icon="mdi-delete"></v-icon>
           </v-list-item-action>
           <v-list-item-content>
               <v-list-item-title>{{code.numbers}} {{code.numCorrect}}</v-list-item-title>
@@ -13,9 +13,9 @@
     </v-list>
 
     <!--code possibilities-->
-    <div v-if="!isPocessing">
-      {{possibilitiesView}}
-    </div>
+    <div v-if="!isPocessing" v-html="possibilitiesRender" />
+      <!-- {{possibilitiesView}} 
+    </div> -->
     <div v-else>
       processing possibilities...
     </div>
@@ -26,10 +26,9 @@
           </v-list-item-content>
       </v-list-item>
     </v-list> -->
-
-    <div>
+    <!-- <div>
       {{json_map}}
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -46,6 +45,7 @@ export default {
             temp_codeRange: 9,
             possibilities: [],
             possibilitiesView: [],
+            possibilitiesRender: [],
             isPocessing: false,
             json_map: ''
         }
@@ -69,6 +69,40 @@ export default {
           this.possibilities.push(cCharCode)
         }
         this.json_map = JSON.stringify(this.possibilities)*/
+      },
+      calcPossibility(newCode, numCorrect) {
+        if(numCorrect === 0)
+        {
+          console.log("remove unnecessary")
+
+          //all characters of array can be removed
+          const tempPossibilities = []
+          this.possibilitiesView = []
+          this.possibilities.forEach(possibility => {
+            if(
+              possibility.x1 !== newCode[0] &&
+              possibility.x2 !== newCode[1] &&
+              possibility.x3 !== newCode[2] &&
+              possibility.x4 !== newCode[3] &&
+              possibility.x5 !== newCode[4]
+            ) {
+              tempPossibilities.push(possibility)
+              this.possibilitiesView.push(`${possibility.x1}${possibility.x2}${possibility.x3}${possibility.x4}${possibility.x5}`)
+            }
+          })
+          
+          this.possibilities = tempPossibilities
+          this.isPocessing = false;
+        }
+      }
+    },
+    watch: {
+      possibilitiesView(newPossibilitiesView, oldPossibilitiesView)
+      {
+        var renderStr = newPossibilitiesView.toString()
+        renderStr = renderStr.replaceAll(',', `</span><span class="pill">`)
+        renderStr = `<span class="pill">${renderStr}</span>`
+        this.possibilitiesRender = renderStr
       }
     },
     computed: {
@@ -88,20 +122,33 @@ export default {
             { numbers: '50000', numCorrect: 1 },
         ]
 
+        this.isPocessing = true;
+        await this.generatePossibilitiesBlank()
+
+        this.isPocessing = true;
+
         //create temp map with current scores
         this.temp_code_map = new Map()
         for(var i = 0; i < this.temp_codeRange; i++)
         {
-          this.temp_code_map.set(exampleCodes[i].numbers, exampleCodes[i].numCorrect)
+          this.calcPossibility(exampleCodes[i].numbers, exampleCodes[i].numCorrect)
+          this.temp_code_map.set(
+            exampleCodes[i].numbers, 
+            {
+              numCorrect: exampleCodes[i].numCorrect, 
+              x1: exampleCodes[i].numbers[0], 
+              x2: exampleCodes[i].numbers[1], 
+              x3: exampleCodes[i].numbers[2], 
+              x4: exampleCodes[i].numbers[3],
+              x5: exampleCodes[i].numbers[4]
+            })
         }
 
         //interactable list (v-for fix for map support)
         this.temp_code_map.forEach((value, key) => {
-          this.temp_codeArr.push({ numbers: key, numCorrect: value})
+          this.temp_codeArr.push({ numbers: key, numCorrect: value.numCorrect})
         })
 
-        this.isPocessing = true;
-        await this.generatePossibilitiesBlank()
     }
 }
 </script>
@@ -110,5 +157,16 @@ export default {
 .v-list{
   height:10rem;
   overflow-y:auto;
+}
+
+.pill{
+  display: flex;
+  padding: 0.5rem;
+  margin: 1rem;
+  float: left;
+  background: #2c7ec5;
+  color: #fff;
+  border-radius: 1rem;
+  font-weight: 400;
 }
 </style>
