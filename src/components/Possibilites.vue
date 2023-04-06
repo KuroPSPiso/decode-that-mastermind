@@ -13,7 +13,8 @@
     </v-list>
 
     <!--code possibilities-->
-    <div v-if="!isPocessing" v-html="possibilitiesRender" />
+    <!-- <div v-if="!isPocessing" v-html="possibilitiesRender" /> -->
+    <div class="possibilities" v-if="!isPocessing" v-html="possibilitiesRender" />
       <!-- {{possibilitiesView}} 
     </div> -->
     <div v-else>
@@ -154,8 +155,8 @@ export default {
 </script>
 
 <style>
-.v-list{
-  height:10rem;
+.v-list, .possibilities{
+  height:40vh;
   overflow-y:auto;
 }
 
