@@ -48,6 +48,9 @@ namespace calc
 			else
             {
 				//TODO: IF
+
+
+
 				potentialPile.Add(newEntry, count);
 			}
 
@@ -72,12 +75,13 @@ namespace calc
 			{
 				if (discardedItem.Value == 0)
 				{
-					//conversion step skipped in JS
+					//VVVVV conversion step skipped in JS
 					int x1 = Convert.ToInt32(new string(discardedItem.Key[0], 1));
 					int x2 = Convert.ToInt32(new string(discardedItem.Key[1], 1));
 					int x3 = Convert.ToInt32(new string(discardedItem.Key[2], 1));
 					int x4 = Convert.ToInt32(new string(discardedItem.Key[3], 1));
 					int x5 = Convert.ToInt32(new string(discardedItem.Key[4], 1));
+					//^^^^^^^
 
 					X1[x1] = -1;
 					X2[x2] = -1;
