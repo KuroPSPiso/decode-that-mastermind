@@ -29,14 +29,12 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
 import Possibilities from './components/Possibilites.vue';
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld,
     Possibilities
   },
 

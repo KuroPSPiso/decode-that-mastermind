@@ -35,6 +35,7 @@ export default {
             confirmedDigits: [],
             isRemove: false,
             isProcessing: false,
+            renderCycle: 0,
             processingSize: 100,
             possibilitiesRender: '<span />',
             possibilitiesView: ''
@@ -56,12 +57,12 @@ export default {
         this.x4 = Array.from(defaultPossibilities.baseX)
         this.x5 = Array.from(defaultPossibilities.baseX)
         this.confirmedDigits = Array.from(defaultPossibilities.confirmedDigits)
-        searchPile.forEach((count, entry)  => {
+        this.searchPile.forEach((count, entry)  => {
           this.checkKnown(entry, count, false, true)
         })
 
         this.rebuildComparitor()
-        //this.RenderNumbers()
+        this.RenderNumbers()
       },
       checkKnown(entry, count, isRemove = false, bypassRebuild = false)
       { 
@@ -75,7 +76,9 @@ export default {
         }
 
         if(!bypassRebuild){
-          if(!this.searchPile.has(entry)) this.searchPile.set(entry, count)
+          if(!this.searchPile.has(entry)) {
+             this.searchPile.set(entry, count)
+          }
           else return
         }
 
@@ -135,7 +138,7 @@ export default {
 
         if(!bypassRebuild){
           this.rebuildComparitor()
-          //this.RenderNumbers()
+          this.RenderNumbers()
         } 
       },
       rebuildComparitor() {
@@ -193,7 +196,10 @@ export default {
         return remainder == 9 ? checkVal : -1;
       },
       RenderNumbers(){
-        this.$worker.run((X1, X2, X3, X4, X5) => {
+        const renderCycle = this.renderCycle + 1
+        this.renderCycle = renderCycle
+
+        this.$worker.run((X1, X2, X3, X4, X5, renderCycle) => {
           let retHTML = ''
           for (let i = 0; i < 100000; i++)
           {
@@ -207,24 +213,22 @@ export default {
 
             if (state === false)
             {
-              /*
-                retHTML += '<span class="pill">'
-                retHTML += (i.toString().padStart(5, '0'))
-                retHTML += ('</span>') //separator
-              */
               retHTML += `${i.toString().padStart(5, '0')}\t`
             }
           }
-          return retHTML
-        }, [this.X1, this.X2, this.X3, this.X4, this.X5])
+          return { html: retHTML, cycle: renderCycle }
+        }, [this.X1, this.X2, this.X3, this.X4, this.X5, renderCycle])
         .then(result => {
-          console.log(result)
-          this.possibilitiesView = result
-          this.isProcessing = false
+          if(this.renderCycle == result.cycle){
+            this.possibilitiesView = result.html
+            this.isProcessing = false
+          }
         })
         .catch(e => {
-          this.possibilitiesView = e
-          this.isProcessing = false
+          if(this.renderCycle == result.cycle){
+            this.possibilitiesView = e
+            this.isProcessing = false
+          }
         })
       }
     },
@@ -245,14 +249,7 @@ export default {
         this.temp_entries = [
             { numbers: '00000', numCorrect: 0 },
             { numbers: '00011', numCorrect: 2 },
-            { numbers: '11100', numCorrect: 3 },
-            { numbers: '00100', numCorrect: 0 },
-            { numbers: '01000', numCorrect: 1 },
-            { numbers: '44444', numCorrect: 2 },
-            { numbers: '71360', numCorrect: 1 },
-            { numbers: '98475', numCorrect: 0 },
-            { numbers: '55500', numCorrect: 1 },
-            { numbers: '50000', numCorrect: 1 },
+            { numbers: '11100', numCorrect: 3 }
         ]
 
         //Reset
@@ -271,11 +268,11 @@ export default {
         {
           for(let iEntry = 0; iEntry < this.temp_codeRange; iEntry++)
           {
-            this.checkKnown(this.temp_entries[iEntry].numbers, this.temp_entries[iEntry].numCorrect);
+            this.checkKnown(this.temp_entries[iEntry].numbers, this.temp_entries[iEntry].numCorrect)
           }
         }
 
-        this.RenderNumbers();
+        //this.RenderNumbers()
     }
 }
 </script>
