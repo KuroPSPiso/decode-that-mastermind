@@ -21,6 +21,9 @@ npm run build
 ### Main Packages
 * Vue 2
 * Vuetify
+#### additional
+* vue-worker
+* mdi
 
 ### Functionality:
 
