@@ -58,8 +58,10 @@ export default {
         if(localStorage.getItem('codes')!== null){
           this.codeRecords = new Map(Object.entries(JSON.parse(localStorage.getItem('codes'))))
         }
-
-        //for loop
+        this.codeRecords.forEach((count, code) => {
+            this.$refs.possibilities.isProcessing = true
+            this.$refs.possibilities.checkKnown(code.toString(), Number(count))
+        });
       },
       async addRecord() {
         const valid = await this.$refs.entryForm.validate()
