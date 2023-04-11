@@ -22,20 +22,19 @@
     </v-app-bar>
 
     <v-main>
-      <Possibilities/>
-      <!-- <HelloWorld/> -->
+      <CodeEntries/>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import Possibilities from './components/Possibilites.vue';
+import CodeEntries from './components/CodeEntries.vue';
 
 export default {
   name: 'App',
 
   components: {
-    Possibilities
+    CodeEntries
   },
 
   data: () => ({

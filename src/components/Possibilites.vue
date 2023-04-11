@@ -272,7 +272,7 @@ export default {
           }
         }
 
-        //this.RenderNumbers()
+        if(!this.debug) this.RenderNumbers()
     }
 }
 </script>
