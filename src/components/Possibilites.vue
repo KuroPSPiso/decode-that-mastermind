@@ -1,19 +1,10 @@
 <template>
   <div>
-    <!--temp active codes list-->
-    <!-- <v-list>
-      <v-list-item v-for="code in temp_codeArr" :key="code.numbers">
-          <v-list-item-action>
-              <v-icon icon="mdi-delete"></v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-              <v-list-item-title>{{code.numbers}} {{code.numCorrect}}</v-list-item-title>
-          </v-list-item-content>
-      </v-list-item>
-    </v-list> -->
+    <div class="test-entries">
+      <p v-for="index in temp_entries" :key="index.numbers">{{index.numbers}} ({{index.numCorrect}})</p>
+    </div>
 
     <!--code possibilities-->
-    <!-- <div class="possibilities" v-if="!isProcessing" v-html="possibilitiesRender" /> -->
     <code class="possibilities" v-if="!isProcessing" v-html="possibilitiesRender" />
     <div v-else>
       processing possibilities...
@@ -24,15 +15,14 @@
 <script>
 import defaultPossibilities from '../assets/default_possibilities.json'
 
-
 export default {
     name: 'Possibilities',
     data() {
         return{
 
-            temp_codeArr: [],
+            temp_entries: [],
             temp_codeMap: new Map(),
-            temp_codeRange: 9,
+            temp_codeRange: 1,
 
             searchPile: new Map(),
             discardPile: new Map(),
@@ -51,10 +41,6 @@ export default {
         }
     },
     methods: {
-      async generatePossibilitiesBlank() {
-        this.possibilities = defaultPossibilities
-        this.possibilitiesView.push(`${possibility.x1}${possibility.x2}${possibility.x3}${possibility.x4}${possibility.x5}`)
-      },
       removeEntry(entry){
         //remove entry
         this.searchPile.delete(entry)
@@ -63,7 +49,7 @@ export default {
         this.discardPile.clear()
         this.potentialPile.clear()
 
-        this.isRemove = false
+        //this.isRemove = false
         this.confirmedDigits = defaultPossibilities.confirmedDigits
         this.X1 = defaultPossibilities.baseX
         this.X2 = defaultPossibilities.baseX
@@ -71,30 +57,36 @@ export default {
         this.X4 = defaultPossibilities.baseX
         this.X5 = defaultPossibilities.baseX
         searchPile.forEach((count, entry)  => {
-          this.checkKnown(entry, count, true)
+          this.checkKnown(entry, count, false, true)
         })
 
-        rebuildComparitor()
+        this.rebuildComparitor()
+        //this.RenderNumbers()
       },
-      checkKnown(entry, count, bypassRebuild = false)
-      {
+      checkKnown(entry, count, isRemove = false, bypassRebuild = false)
+      { 
+        console.log(entry)
+
         if(entry.length < 5) return; //number is invalid
 
-        if(this.isRemove)
+        if(isRemove)
         {
           removeEntry(entry)
           return
         }
 
+        console.log(bypassRebuild)
         if(!bypassRebuild){
           if(!this.searchPile.has(entry)) this.searchPile.set(entry, count)
           else return
         }
 
+        console.log(count)
         if(count === 0){
           /* Filter step 1.
            * Add entry to pool of discarded numbers. each number in the sequence can be eliminated for the remainder.
            */
+          console.log(`do discard`)
           this.discardPile.set(entry, count)
         } else {
           /* Filter step 2.
@@ -145,7 +137,10 @@ export default {
           }
         }
 
-        if(!bypassRebuild) rebuildComparitor()
+        if(!bypassRebuild){
+          this.rebuildComparitor()
+          //this.RenderNumbers()
+        } 
       },
       rebuildComparitor() {
         this.X1 = defaultPossibilities.baseX
@@ -154,6 +149,7 @@ export default {
         this.X4 = defaultPossibilities.baseX
         this.X5 = defaultPossibilities.baseX
 
+        console.log(this.X1)
         //disable values from X using filter step 1.
         this.discardPile.forEach((count, entry) => {
           if(count === 0){
@@ -170,23 +166,27 @@ export default {
             this.X5[x5] = -1
           }
         })
+        console.log(this.X1)
         // skip already confirmed digits
-        if (this.confirmedDigits[0] === -1) this.confirmedDigits[0] = this.CheckRemainder(X1)
-        if (this.confirmedDigits[1] === -1) this.confirmedDigits[1] = this.CheckRemainder(X2)
-        if (this.confirmedDigits[2] === -1) this.confirmedDigits[2] = this.CheckRemainder(X3)
-        if (this.confirmedDigits[3] === -1) this.confirmedDigits[3] = this.CheckRemainder(X4)
-        if (this.confirmedDigits[4] === -1) this.confirmedDigits[4] = this.CheckRemainder(X5)
+        if (this.confirmedDigits[0] === -1) this.confirmedDigits[0] = this.CheckRemainder(this.X1)
+        if (this.confirmedDigits[1] === -1) this.confirmedDigits[1] = this.CheckRemainder(this.X2)
+        if (this.confirmedDigits[2] === -1) this.confirmedDigits[2] = this.CheckRemainder(this.X3)
+        if (this.confirmedDigits[3] === -1) this.confirmedDigits[3] = this.CheckRemainder(this.X4)
+        if (this.confirmedDigits[4] === -1) this.confirmedDigits[4] = this.CheckRemainder(this.X5)
+        console.log(this.X1)
 
         //disable values from X using filter step 2.
         for (let i = 0; i < 10; i++)
         {
           //TODO: fix rem issue (store state?)
-          if (this.confirmedDigits[0] !== -1) X1[i] = (this.confirmedDigits[0] === i) ? 0 : -1;
-          if (this.confirmedDigits[1] !== -1) X2[i] = (this.confirmedDigits[1] === i) ? 0 : -1;
-          if (this.confirmedDigits[2] !== -1) X3[i] = (this.confirmedDigits[2] === i) ? 0 : -1;
-          if (this.confirmedDigits[3] !== -1) X4[i] = (this.confirmedDigits[3] === i) ? 0 : -1;
-          if (this.confirmedDigits[4] !== -1) X5[i] = (this.confirmedDigits[4] === i) ? 0 : -1;
+          if (this.confirmedDigits[0] !== -1) this.X1[i] = (this.confirmedDigits[0] === i) ? 0 : -1;
+          if (this.confirmedDigits[1] !== -1) this.X2[i] = (this.confirmedDigits[1] === i) ? 0 : -1;
+          if (this.confirmedDigits[2] !== -1) this.X3[i] = (this.confirmedDigits[2] === i) ? 0 : -1;
+          if (this.confirmedDigits[3] !== -1) this.X4[i] = (this.confirmedDigits[3] === i) ? 0 : -1;
+          if (this.confirmedDigits[4] !== -1) this.X5[i] = (this.confirmedDigits[4] === i) ? 0 : -1;
         }
+        console.log(this.X1)
+        console.log(this.confirmedDigits[0])
       },
       CheckRemainder(xNUM) {
         //check if all values have been disabled but 1 for X.
@@ -205,7 +205,7 @@ export default {
           let retHTML = ''
           for (let i = 0; i < 100000; i++)
           {
-            let state = (
+            const state = (
                 X1[(i % 100000 - i % 10000) / 10000] == -1 ||
                 X2[(i % 10000 - i % 1000) / 1000] == -1 ||
                 X3[(i % 1000 - i % 100) / 100] == -1 ||
@@ -226,6 +226,7 @@ export default {
           return retHTML
         }, [this.X1, this.X2, this.X3, this.X4, this.X5])
         .then(result => {
+          console.log(result)
           this.possibilitiesView = result
           this.isProcessing = false
         })
@@ -249,7 +250,7 @@ export default {
     computed: {
     },
     async mounted() {
-        const exampleCodes = [
+        this.temp_entries = [
             { numbers: '00000', numCorrect: 0 },
             { numbers: '00011', numCorrect: 2 },
             { numbers: '11100', numCorrect: 3 },
@@ -269,40 +270,22 @@ export default {
         this.x3 = defaultPossibilities.baseX
         this.x4 = defaultPossibilities.baseX
         this.x5 = defaultPossibilities.baseX
+        this.confirmedDigits = defaultPossibilities.confirmedDigits
 
         this.isProcessing = true;
 
-        this.RenderNumbers();
-
-        //debug stuff
-        /*
-        //create temp map with current scores
-        this.temp_code_map = new Map()
-        for(var i = 0; i < this.temp_codeRange; i++)
+        for(let iEntry = 0; iEntry < this.temp_codeRange; iEntry++)
         {
-          this.calcPossibility(exampleCodes[i].numbers, exampleCodes[i].numCorrect)
-          this.temp_code_map.set(
-            exampleCodes[i].numbers, 
-            {
-              numCorrect: exampleCodes[i].numCorrect, 
-              x1: exampleCodes[i].numbers[0], 
-              x2: exampleCodes[i].numbers[1], 
-              x3: exampleCodes[i].numbers[2], 
-              x4: exampleCodes[i].numbers[3],
-              x5: exampleCodes[i].numbers[4]
-            })
+          this.checkKnown(this.temp_entries[iEntry].numbers, this.temp_entries[iEntry].numCorrect);
         }
 
-        //interactable list (v-for fix for map support)
-        this.temp_code_map.forEach((value, key) => {
-          this.temp_codeArr.push({ numbers: key, numCorrect: value.numCorrect})
-        })*/
+        this.RenderNumbers();
     }
 }
 </script>
 
 <style>
-.v-list, .possibilities{
+.test-entries, .possibilities{
   height:40vh;
   overflow-y:auto;
   display: block;
