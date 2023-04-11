@@ -38,6 +38,19 @@ export default {
       }
     },
     methods: {
+      saveData() {
+        if(this.codeRecords.entries() !== null) {
+          const jsonMap = JSON.stringify(Object.fromEntries(this.codeRecords))
+          localStorage.setItem('codes', jsonMap)
+        } else {
+          localStorage.removeItem('codes')
+        }
+      },
+      loadData() {
+        if(localStorage.getItem('codes')!== null){
+          this.codeRecords = new Map(Object.entries(JSON.parse(localStorage.getItem('codes'))))
+        }
+      },
       async addRecord() {
         const valid = await this.$refs.entryForm.validate()
         if(valid){
@@ -48,6 +61,7 @@ export default {
           }
           else { 
             this.codeRecords.set(this.code, this.count)
+            this.saveData()
             this.$forceUpdate()
           }
         }
@@ -55,9 +69,13 @@ export default {
       remove(key, count){
         if (confirm(`Remove code "${key}" with ${count} correct numbers`)){
           this.codeRecords.delete(key)
+          this.saveData()
           this.$forceUpdate()
         }
       }
+    },
+    mounted() {
+      this.loadData()
     }
 }
 </script>
