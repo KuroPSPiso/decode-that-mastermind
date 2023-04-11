@@ -70,21 +70,24 @@ export default {
             }
           }
           else { 
-            this.codeRecords.set(this.code, this.count)
+            this.codeRecords.set(this.code.toString(), Number(this.count))
             this.saveData()
 
             this.$refs.possibilities.isProcessing = true
-            this.$refs.possibilities.checkKnown(this.code, this.count)
-            this.$refs.possibilities.RenderNumbers()
+            this.$refs.possibilities.checkKnown(this.code.toString(), Number(this.count))
 
             this.$forceUpdate()
           }
         }
       },
-      remove(key, count){
-        if (confirm(`Remove code "${key}" with ${count} correct numbers`)){
-          this.codeRecords.delete(key)
+      remove(code, count){
+        if (confirm(`Remove code "${code}" with ${Number(count)} correct numbers`)){
+          this.codeRecords.delete(code.toString())
           this.saveData()
+
+          this.$refs.possibilities.isProcessing = true
+          this.$refs.possibilities.removeEntry(code.toString())
+          
           this.$forceUpdate()
         }
       }

@@ -62,7 +62,7 @@ export default {
         })
 
         this.rebuildComparitor()
-        //this.RenderNumbers()
+        this.RenderNumbers()
       },
       checkKnown(entry, count, isRemove = false, bypassRebuild = false)
       { 
@@ -141,7 +141,7 @@ export default {
 
         if(!bypassRebuild){
           this.rebuildComparitor()
-          //this.RenderNumbers()
+          this.RenderNumbers()
         } 
       },
       rebuildComparitor() {
@@ -258,10 +258,10 @@ export default {
         //Reset
         const correctCode = defaultPossibilities.debugResult
         this.X1 = Array.from(defaultPossibilities.baseX)
-        this.x2 = Array.from(defaultPossibilities.baseX)
-        this.x3 = Array.from(defaultPossibilities.baseX)
-        this.x4 = Array.from(defaultPossibilities.baseX)
-        this.x5 = Array.from(defaultPossibilities.baseX)
+        this.X2 = Array.from(defaultPossibilities.baseX)
+        this.X3 = Array.from(defaultPossibilities.baseX)
+        this.X4 = Array.from(defaultPossibilities.baseX)
+        this.X5 = Array.from(defaultPossibilities.baseX)
         this.confirmedDigits = Array.from(defaultPossibilities.confirmedDigits)
 
         this.isProcessing = true;
