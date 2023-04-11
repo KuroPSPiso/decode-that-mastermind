@@ -32,37 +32,15 @@ namespace calc
 		static bool debugNumber = true;
 		static bool isRemove = false;
 
-		static void checkKnown(string newEntry, int count, bool bypassRebuild = false)
+		static void CheckKnown(string newEntry, int count, bool bypassRebuild = false)
 		{
 			if (isRemove)
-			{
-				searchPile.Remove(newEntry);
-				//discardPile.Remove(newEntry);
-				//potentialPile.Remove(newEntry);
+            {
+                RemoveEntry(newEntry);
+                return;
+            }
 
-				discardPile.Clear();
-				potentialPile.Clear();
-
-				//retrain fully (slow, but safe + reusable for clean restart)
-				isRemove = false;
-				confirmedDigits = new int[]{
-					-1, -1, -1, -1, -1
-				};
-				X1 = new int[10];
-				X2 = new int[10];
-				X3 = new int[10];
-				X4 = new int[10];
-				X5 = new int[10];
-				foreach (var item in searchPile)
-                {
-					checkKnown(item.Key, item.Value, true);
-                }
-
-				RebuildComparitor();
-				return;
-			}
-
-			if (!bypassRebuild)
+            if (!bypassRebuild)
 			{
 				if (!searchPile.ContainsKey(newEntry)) searchPile.Add(newEntry, count); //add entered word to list with the correct count.
 				else return; //already processed
@@ -122,9 +100,34 @@ namespace calc
 			if(!bypassRebuild) RebuildComparitor();
 		}
 
-		//rebuilding the array from scratch at any request to allow for load and delete
-		//solution is slower than additive solutions
-		static void RebuildComparitor()
+        private static void RemoveEntry(string newEntry)
+        {
+            searchPile.Remove(newEntry);
+
+			//retrain fully (slow, but safe + reusable for clean restart)
+			discardPile.Clear();
+            potentialPile.Clear();
+
+            isRemove = false;
+            confirmedDigits = new int[]{
+                    -1, -1, -1, -1, -1
+                };
+            X1 = new int[10];
+            X2 = new int[10];
+            X3 = new int[10];
+            X4 = new int[10];
+            X5 = new int[10];
+            foreach (var item in searchPile)
+            {
+                CheckKnown(item.Key, item.Value, true);
+            }
+
+            RebuildComparitor();
+        }
+
+        //rebuilding the array from scratch at any request to allow for load and delete
+        //solution is slower than additive solutions
+        static void RebuildComparitor()
 		{
 			//Buffer.BlockCopy(baseComparitorArr, 0, comparitorArr, 0, baseComparitorArr.Length);
 			//reset numbers
@@ -243,7 +246,7 @@ namespace calc
 				}
 				string d = countCorrect.ToString();
 
-				checkKnown(data, countCorrect);
+				CheckKnown(data, countCorrect);
 
 				RenderNumbers();
 				Console.WriteLine("No. correct in ({1}): {0}", d, data);
