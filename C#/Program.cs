@@ -3,7 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace calc
-{
+{ 
+	public class storedResult
+    {
+		public int Count;
+		public int[] Confirmed;
+    }
+
 	public class Program
 	{
 		static Dictionary<string, int> searchPile = new Dictionary<string, int>();
@@ -47,11 +53,48 @@ namespace calc
 			}
 			else
             {
-				//TODO: IF
+				//Check if code has invalidated points
+				int[] x = new int[5];
+				bool[] failsX = new bool[5];
+				int failCount = 0;
+				bool newPotential = false;
 
+				x[0] = Int32.Parse(new string($"{newEntry[0]}"));
+				x[1] = Int32.Parse(new string($"{newEntry[1]}"));
+				x[2] = Int32.Parse(new string($"{newEntry[2]}"));
+				x[3] = Int32.Parse(new string($"{newEntry[3]}"));
+				x[4] = Int32.Parse(new string($"{newEntry[4]}"));
 
+				failCount += (failsX[0] = X1[x[0]] == -1) ? 1 : 0;
+				failCount += (failsX[1] = X2[x[1]] == -1) ? 1 : 0;
+				failCount += (failsX[2] = X3[x[2]] == -1) ? 1 : 0;
+				failCount += (failsX[3] = X4[x[3]] == -1) ? 1 : 0;
+				failCount += (failsX[4] = X5[x[4]] == -1) ? 1 : 0;
 
-				potentialPile.Add(newEntry, count);
+				if (failsX[0] || failsX[1] || failsX[2] || failsX[3] || failsX[4])
+				{
+					//check if a whole number is detected.
+					if (failCount + count == 5)
+					{
+						//set correct digits if number is known
+						for (int i = 0; i < 5; i++)
+						{
+							if (!failsX[i]) confirmedDigits[i] = x[i];
+						}
+						discardPile.Add(newEntry, count);
+					}
+					else
+					{
+						//variable not yet known
+						potentialPile.Add(newEntry, count);
+						newPotential = true;
+					}
+				}
+				else
+				{
+					potentialPile.Add(newEntry, count);
+					newPotential = true;
+				}
 			}
 
 			RebuildComparitor();
@@ -68,7 +111,6 @@ namespace calc
 			BaseX.CopyTo(X3, 0);
 			BaseX.CopyTo(X4, 0);
 			BaseX.CopyTo(X5, 0);
-
 
 			//remove all numbers know to have no corrolation
 			foreach (var discardedItem in discardPile)
@@ -90,11 +132,22 @@ namespace calc
 					X5[x5] = -1;
 				}
 			}
-			confirmedDigits[0] = CheckRemainder(X1);
-			confirmedDigits[1] = CheckRemainder(X2);
-			confirmedDigits[2] = CheckRemainder(X3);
-			confirmedDigits[3] = CheckRemainder(X4);
-			confirmedDigits[4] = CheckRemainder(X5);
+			if (confirmedDigits[0] == -1) confirmedDigits[0] = CheckRemainder(X1);
+			if (confirmedDigits[1] == -1) confirmedDigits[1] = CheckRemainder(X2);
+			if (confirmedDigits[2] == -1) confirmedDigits[2] = CheckRemainder(X3);
+			if (confirmedDigits[3] == -1) confirmedDigits[3] = CheckRemainder(X4);
+			if (confirmedDigits[4] == -1) confirmedDigits[4] = CheckRemainder(X5);
+
+			//disable X values based on confirmed digits
+			for (int i = 0; i < 10; i++)
+			{
+				//TODO: fix rem issue (store state?)
+				if (confirmedDigits[0] != -1) X1[i] = (confirmedDigits[0] == i) ? 0 : -1;
+				if (confirmedDigits[1] != -1) X2[i] = (confirmedDigits[1] == i) ? 0 : -1;
+				if (confirmedDigits[2] != -1) X3[i] = (confirmedDigits[2] == i) ? 0 : -1;
+				if (confirmedDigits[3] != -1) X4[i] = (confirmedDigits[3] == i) ? 0 : -1;
+				if (confirmedDigits[4] != -1) X5[i] = (confirmedDigits[4] == i) ? 0 : -1;
+			}
 		}
 
 		static int CheckRemainder(int[] xNUM)
@@ -148,7 +201,6 @@ namespace calc
 			BaseX.CopyTo(X4, 0);
 			BaseX.CopyTo(X5, 0);
 
-
 			while (true)
 			{
 				redo:
@@ -172,7 +224,7 @@ namespace calc
 
 				RenderNumbers();
 				Console.WriteLine("No. correct in ({1}): {0}", d, data);
-				Console.WriteLine("confirmed ({1}{1}{1}{1}{1})",
+				Console.WriteLine("confirmed ({0}{1}{2}{3}{4})",
 					confirmedDigits[0] != -1 ? confirmedDigits[0].ToString() : '?',
 					confirmedDigits[1] != -1 ? confirmedDigits[1].ToString() : '?',
 					confirmedDigits[2] != -1 ? confirmedDigits[2].ToString() : '?',
