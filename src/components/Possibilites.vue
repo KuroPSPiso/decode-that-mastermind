@@ -22,7 +22,7 @@ export default {
 
             temp_entries: [],
             temp_codeMap: new Map(),
-            temp_codeRange: 1,
+            temp_codeRange: 2,
 
             searchPile: new Map(),
             discardPile: new Map(),
@@ -50,12 +50,12 @@ export default {
         this.potentialPile.clear()
 
         //this.isRemove = false
-        this.confirmedDigits = defaultPossibilities.confirmedDigits
-        this.X1 = defaultPossibilities.baseX
-        this.X2 = defaultPossibilities.baseX
-        this.X3 = defaultPossibilities.baseX
-        this.X4 = defaultPossibilities.baseX
-        this.X5 = defaultPossibilities.baseX
+        this.X1 = Array.from(defaultPossibilities.baseX)
+        this.x2 = Array.from(defaultPossibilities.baseX)
+        this.x3 = Array.from(defaultPossibilities.baseX)
+        this.x4 = Array.from(defaultPossibilities.baseX)
+        this.x5 = Array.from(defaultPossibilities.baseX)
+        this.confirmedDigits = Array.from(defaultPossibilities.confirmedDigits)
         searchPile.forEach((count, entry)  => {
           this.checkKnown(entry, count, false, true)
         })
@@ -117,13 +117,17 @@ export default {
 
           if(failCount > 0)
           {
+            console.log(failCount)
             //check if FailCount + count = 5 digits
             if(failCount + count === 5){
+              console.log('s2')
+              console.log(this.confirmedDigits)
               //update and set the correct digits (those that didn't fail)
               for (let i = 0; i < 5; i++)
               {
-                if (!failsX[i]) this.confirmedDigits[i] = x[i]
+                if (!failsX[i]) this.confirmedDigits[i] = Number(x[i])
               }
+              console.log(this.confirmedDigits)
               this.discardPile.set(entry, count)
             } else {
               //variable has known correct values, but positioning is not yet fully known or validated
@@ -131,6 +135,7 @@ export default {
               hasNewPotential = true
             }
           } else {
+            console.log('s3')
             //variable has known correct values, but positioning is not yet known or validated
             this.potentialPile.set(entry, count)
             hasNewPotential = true
@@ -143,11 +148,11 @@ export default {
         } 
       },
       rebuildComparitor() {
-        this.X1 = defaultPossibilities.baseX
-        this.X2 = defaultPossibilities.baseX
-        this.X3 = defaultPossibilities.baseX
-        this.X4 = defaultPossibilities.baseX
-        this.X5 = defaultPossibilities.baseX
+        this.X1 = Array.from(defaultPossibilities.baseX)
+        this.x2 = Array.from(defaultPossibilities.baseX)
+        this.x3 = Array.from(defaultPossibilities.baseX)
+        this.x4 = Array.from(defaultPossibilities.baseX)
+        this.x5 = Array.from(defaultPossibilities.baseX)
 
         console.log(this.X1)
         //disable values from X using filter step 1.
@@ -166,18 +171,36 @@ export default {
             this.X5[x5] = -1
           }
         })
+
+        console.log("after discard")
         console.log(this.X1)
+        console.log(this.X2)
+        console.log(this.X3)
+        console.log(this.X4)
+        console.log(this.X5)
+        console.log(this.confirmedDigits)
         // skip already confirmed digits
         if (this.confirmedDigits[0] === -1) this.confirmedDigits[0] = this.CheckRemainder(this.X1)
         if (this.confirmedDigits[1] === -1) this.confirmedDigits[1] = this.CheckRemainder(this.X2)
         if (this.confirmedDigits[2] === -1) this.confirmedDigits[2] = this.CheckRemainder(this.X3)
         if (this.confirmedDigits[3] === -1) this.confirmedDigits[3] = this.CheckRemainder(this.X4)
         if (this.confirmedDigits[4] === -1) this.confirmedDigits[4] = this.CheckRemainder(this.X5)
+        
+        
+        
+        console.log("after skip")
         console.log(this.X1)
+        console.log(this.X2)
+        console.log(this.X3)
+        console.log(this.X4)
+        console.log(this.X5)
 
         //disable values from X using filter step 2.
         for (let i = 0; i < 10; i++)
         {
+        console.log(this.confirmedDigits[0] !== -1)
+        console.log(this.confirmedDigits[3] !== -1)
+        console.log(this.confirmedDigits[4] !== -1)
           //TODO: fix rem issue (store state?)
           if (this.confirmedDigits[0] !== -1) this.X1[i] = (this.confirmedDigits[0] === i) ? 0 : -1;
           if (this.confirmedDigits[1] !== -1) this.X2[i] = (this.confirmedDigits[1] === i) ? 0 : -1;
@@ -185,8 +208,13 @@ export default {
           if (this.confirmedDigits[3] !== -1) this.X4[i] = (this.confirmedDigits[3] === i) ? 0 : -1;
           if (this.confirmedDigits[4] !== -1) this.X5[i] = (this.confirmedDigits[4] === i) ? 0 : -1;
         }
-        console.log(this.X1)
-        console.log(this.confirmedDigits[0])
+        console.log("after filter 2")
+        console.log('x1' + this.X1)
+        console.log('x2' + this.X2)
+        console.log('x3' + this.X3)
+        console.log('x4' + this.X4)
+        console.log('x5' + this.X5)
+        console.log(this.confirmedDigits)
       },
       CheckRemainder(xNUM) {
         //check if all values have been disabled but 1 for X.
@@ -265,12 +293,12 @@ export default {
 
         //Reset
         const correctCode = defaultPossibilities.debugResult
-        this.X1 = defaultPossibilities.baseX
-        this.x2 = defaultPossibilities.baseX
-        this.x3 = defaultPossibilities.baseX
-        this.x4 = defaultPossibilities.baseX
-        this.x5 = defaultPossibilities.baseX
-        this.confirmedDigits = defaultPossibilities.confirmedDigits
+        this.X1 = Array.from(defaultPossibilities.baseX)
+        this.x2 = Array.from(defaultPossibilities.baseX)
+        this.x3 = Array.from(defaultPossibilities.baseX)
+        this.x4 = Array.from(defaultPossibilities.baseX)
+        this.x5 = Array.from(defaultPossibilities.baseX)
+        this.confirmedDigits = Array.from(defaultPossibilities.confirmedDigits)
 
         this.isProcessing = true;
 
