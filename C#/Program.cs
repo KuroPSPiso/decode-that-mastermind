@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace calc
-{ 
+{
 	public class storedResult
-    {
+	{
 		public int Count;
 		public int[] Confirmed;
-    }
+	}
 
 	public class Program
 	{
@@ -21,7 +21,7 @@ namespace calc
 		/// 5 numbers [x1][x2][x3][x4][x5] (exmpl. #12345 x1=1, x2=2 ...etc).
 		/// Used for rebuild:  -1 = false, 0 = neutral
 		/// </summary>
-		static int[] X1 = new int[10], X2 = new int[10], X3 = new int[10], X4 = new int[10], X5 = new int[10]; 
+		static int[] X1 = new int[10], X2 = new int[10], X3 = new int[10], X4 = new int[10], X5 = new int[10];
 
 		static int[] confirmedDigits = {
 			-1, -1, -1, -1, -1
@@ -32,27 +32,49 @@ namespace calc
 		static bool debugNumber = true;
 		static bool isRemove = false;
 
-		static void checkKnown(string newEntry, int count)
-        {
-			if(isRemove)
-            {
+		static void checkKnown(string newEntry, int count, bool bypassRebuild = false)
+		{
+			if (isRemove)
+			{
 				searchPile.Remove(newEntry);
-				discardPile.Remove(newEntry);
-				potentialPile.Remove(newEntry);
+				//discardPile.Remove(newEntry);
+				//potentialPile.Remove(newEntry);
+
+				discardPile.Clear();
+				potentialPile.Clear();
+
+				//retrain fully (slow, but safe + reusable for clean restart)
+				isRemove = false;
+				confirmedDigits = new int[]{
+					-1, -1, -1, -1, -1
+				};
+				X1 = new int[10];
+				X2 = new int[10];
+				X3 = new int[10];
+				X4 = new int[10];
+				X5 = new int[10];
+				foreach (var item in searchPile)
+                {
+					checkKnown(item.Key, item.Value, true);
+                }
+
 				RebuildComparitor();
 				return;
-            }
+			}
 
-			if (!searchPile.ContainsKey(newEntry)) searchPile.Add(newEntry, count); //add entered word to list with the correct count.
-			else return; //already processed
+			if (!bypassRebuild)
+			{
+				if (!searchPile.ContainsKey(newEntry)) searchPile.Add(newEntry, count); //add entered word to list with the correct count.
+				else return; //already processed
+			}
 
 			//remove immediately if count is equal to 0
-			if(count == 0)
-            {
+			if (count == 0)
+			{
 				discardPile.Add(newEntry, count);
 			}
 			else
-            {
+			{
 				//Check if code has invalidated points
 				int[] x = new int[5];
 				bool[] failsX = new bool[5];
@@ -97,13 +119,13 @@ namespace calc
 				}
 			}
 
-			RebuildComparitor();
+			if(!bypassRebuild) RebuildComparitor();
 		}
 
 		//rebuilding the array from scratch at any request to allow for load and delete
 		//solution is slower than additive solutions
 		static void RebuildComparitor()
-        {
+		{
 			//Buffer.BlockCopy(baseComparitorArr, 0, comparitorArr, 0, baseComparitorArr.Length);
 			//reset numbers
 			BaseX.CopyTo(X1, 0);
@@ -151,20 +173,20 @@ namespace calc
 		}
 
 		static int CheckRemainder(int[] xNUM)
-        {
+		{
 			int remainder = 0;
 			int checkVal = 0;
-			for(int i = 0; i < xNUM.Length; i++)
-            {
+			for (int i = 0; i < xNUM.Length; i++)
+			{
 				if (xNUM[i] != -1) checkVal = i;
 				remainder = remainder - xNUM[i];
-            }
+			}
 
 			return remainder == 9 ? checkVal : -1;
-        }
+		}
 
 		static void RenderNumbers()
-        {
+		{
 			StringBuilder sb = new StringBuilder();
 
 			for (int i = 0; i < 99999; i++)
@@ -177,14 +199,15 @@ namespace calc
 						X5[(i % 10)] == -1
 					);
 
-				if ( state == false ) { 
+				if (state == false)
+				{
 					sb.Append(i.ToString().PadLeft(5, '0'));
 					sb.Append(' ');
-                }
+				}
 			}
 
 			Console.WriteLine(sb.ToString());
-        }
+		}
 
 		public static void Main()
 		{
@@ -194,7 +217,7 @@ namespace calc
 			if (debugNumber) randomNumber = 11111;
 
 			expectedResult = randomNumber.ToString().PadLeft(5, '0');
-			
+
 			BaseX.CopyTo(X1, 0);
 			BaseX.CopyTo(X2, 0);
 			BaseX.CopyTo(X3, 0);
@@ -203,7 +226,7 @@ namespace calc
 
 			while (true)
 			{
-				redo:
+			redo:
 				Console.Clear();
 				if (debug) Console.WriteLine(expectedResult);
 				Console.WriteLine("enter code:");
@@ -238,9 +261,9 @@ namespace calc
 					Console.ReadLine();
 				}
 				else
-                {
+				{
 					break;
-                }
+				}
 			}
 
 			Console.WriteLine("congrats");
