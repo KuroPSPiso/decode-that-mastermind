@@ -1,25 +1,33 @@
 <template>
-  <div class="entries">
-    <v-layout>
-      <div class="px-4 pt-2">
-        <v-sheet width="300" class="mx-auto">
-            <v-form ref="entryForm">
-                <v-text-field label="Code" v-model="code" :rules="codeRules"></v-text-field>
-                <v-text-field label="Count" v-model="count" :rules="countRules" type="number"></v-text-field>
-                <v-btn color="primary" @click="addRecord">Add</v-btn>
-            </v-form>
-        </v-sheet>
-      </div>
-      <v-chip-group>
-          <v-chip color="primary" v-for="entry in codeRecords" :key="entry.key" @click="remove(entry[0], entry[1])">{{entry[0]}} ({{entry[1]}}) <v-icon>mdi-delete-outline</v-icon></v-chip>
-      </v-chip-group>
-    </v-layout>
+  <div>
+    <div class="entries">
+      <v-layout>
+        <div class="px-4 pt-2">
+          <v-sheet width="300" class="mx-auto">
+              <v-form ref="entryForm">
+                  <v-text-field label="Code" v-model="code" :rules="codeRules"></v-text-field>
+                  <v-text-field label="Count" v-model="count" :rules="countRules" type="number"></v-text-field>
+                  <v-btn color="primary" @click="addRecord">Add</v-btn>
+              </v-form>
+          </v-sheet>
+        </div>
+        <v-chip-group>
+            <v-chip color="primary" v-for="entry in codeRecords" :key="entry.key" @click="remove(entry[0], entry[1])">{{entry[0]}} ({{entry[1]}}) <v-icon>mdi-delete-outline</v-icon></v-chip>
+        </v-chip-group>
+      </v-layout>
+    </div>
+    <Possibilites ref="possibilities" />
   </div>
 </template>
 
 <script>
+import Possibilites from './Possibilites.vue'
+
 export default {
     name: 'CodeEntries',
+    components: {
+      Possibilites
+    },
     data() {
       return {
         codeRecords: new Map(),
@@ -50,6 +58,8 @@ export default {
         if(localStorage.getItem('codes')!== null){
           this.codeRecords = new Map(Object.entries(JSON.parse(localStorage.getItem('codes'))))
         }
+
+        //for loop
       },
       async addRecord() {
         const valid = await this.$refs.entryForm.validate()
@@ -62,6 +72,11 @@ export default {
           else { 
             this.codeRecords.set(this.code, this.count)
             this.saveData()
+
+            this.$refs.possibilities.isProcessing = true
+            this.$refs.possibilities.checkKnown(this.code, this.count)
+            this.$refs.possibilities.RenderNumbers()
+
             this.$forceUpdate()
           }
         }
@@ -83,7 +98,8 @@ export default {
 <style>
 
 .entries{
-  max-height: 40vh;
+  border-bottom: 0.2rem solid blue;
+  padding: 1rem;
 }
 
 </style>

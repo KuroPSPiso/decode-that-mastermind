@@ -52,17 +52,17 @@ export default {
 
         //this.isRemove = false
         this.X1 = Array.from(defaultPossibilities.baseX)
-        this.x2 = Array.from(defaultPossibilities.baseX)
-        this.x3 = Array.from(defaultPossibilities.baseX)
-        this.x4 = Array.from(defaultPossibilities.baseX)
-        this.x5 = Array.from(defaultPossibilities.baseX)
+        this.X2 = Array.from(defaultPossibilities.baseX)
+        this.X3 = Array.from(defaultPossibilities.baseX)
+        this.X4 = Array.from(defaultPossibilities.baseX)
+        this.X5 = Array.from(defaultPossibilities.baseX)
         this.confirmedDigits = Array.from(defaultPossibilities.confirmedDigits)
         this.searchPile.forEach((count, entry)  => {
           this.checkKnown(entry, count, false, true)
         })
 
         this.rebuildComparitor()
-        this.RenderNumbers()
+        //this.RenderNumbers()
       },
       checkKnown(entry, count, isRemove = false, bypassRebuild = false)
       { 
@@ -81,12 +81,15 @@ export default {
           }
           else return
         }
+        console.log(entry, count)
 
-        if(count === 0){
+        if(Number(count) === 0){
+          console.log(entry, count)
           /* Filter step 1.
            * Add entry to pool of discarded numbers. each number in the sequence can be eliminated for the remainder.
            */
           this.discardPile.set(entry, count)
+          console.log(this.discardPile)
         } else {
           /* Filter step 2.
            * check and remove entries that knowingly fail x amount of times,
@@ -138,15 +141,15 @@ export default {
 
         if(!bypassRebuild){
           this.rebuildComparitor()
-          this.RenderNumbers()
+          //this.RenderNumbers()
         } 
       },
       rebuildComparitor() {
         this.X1 = Array.from(defaultPossibilities.baseX)
-        this.x2 = Array.from(defaultPossibilities.baseX)
-        this.x3 = Array.from(defaultPossibilities.baseX)
-        this.x4 = Array.from(defaultPossibilities.baseX)
-        this.x5 = Array.from(defaultPossibilities.baseX)
+        this.X2 = Array.from(defaultPossibilities.baseX)
+        this.X3 = Array.from(defaultPossibilities.baseX)
+        this.X4 = Array.from(defaultPossibilities.baseX)
+        this.X5 = Array.from(defaultPossibilities.baseX)
 
         //disable values from X using filter step 1.
         this.discardPile.forEach((count, entry) => {
